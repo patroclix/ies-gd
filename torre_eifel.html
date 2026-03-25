@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Molécula de ADN · Semana de la Ciencia</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+  <style>
+    :root {
+      --navy:  #1B2A6B;
+      --dark:  #0D1540;
+      --gold:  #E8A820;
+      --gold2: #F5C354;
+      --dim:   rgba(255,255,255,0.18);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: var(--dark);
+      font-family: 'DM Sans', sans-serif;
+      color: white;
+    }
+
+    /* ── fondo con red de nodos como el logo ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120% 80% at 50% -10%, rgba(27,42,107,0.9) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(232,168,32,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* red decorativa SVG de fondo */
+    .bg-net {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.07;
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    .top-bar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid rgba(232,168,32,0.2);
+      background: rgba(13,21,64,0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      animation: slideDown 0.5s ease both;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-block img {
+      height: 32px;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .logo-text .inst {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .logo-text .prog {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.55);
+      font-weight: 300;
+    }
+
+    .semana-badge {
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dark);
+      background: var(--gold);
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── VISOR 3D ── */
+    .viewer-wrap {
+      flex: 1 1 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      --poster-color: transparent;
+      --progress-bar-color: var(--gold);
+      --progress-bar-height: 2px;
+    }
+
+    /* hint de interacción */
+    .hint {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(13,21,64,0.7);
+      border: 1px solid rgba(232,168,32,0.25);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.07em;
+      pointer-events: none;
+      animation: fadeIn 1s ease 1.5s both;
+    }
+
+    .hint svg { opacity: 0.6; flex-shrink: 0; }
+
+    /* AR button override */
+    model-viewer::part(default-ar-button) {
+      bottom: 14px;
+      right: 14px;
+      background: var(--gold);
+      border-radius: 50px;
+      width: auto;
+      padding: 8px 16px;
+    }
+
+    /* ── INFO PANEL ── */
+    .info-panel {
+      flex: 0 0 auto;
+      padding: 14px 20px 18px;
+      background: rgba(13,21,64,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(232,168,32,0.2);
+      animation: slideUp 0.6s ease 0.2s both;
+    }
+
+    .model-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .model-category {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .model-desc {
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.5);
+      font-weight: 300;
+    }
+
+    /* línea dorada decorativa bajo el nombre */
+    .name-line {
+      width: 32px;
+      height: 2px;
+      background: var(--gold);
+      margin: 6px 0 8px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Red de nodos decorativa de fondo -->
+<svg class="bg-net" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice">
+  <g stroke="#E8A820" stroke-width="0.8" fill="none">
+    <line x1="60"  y1="120" x2="200" y2="80"/>
+    <line x1="200" y1="80"  x2="340" y2="140"/>
+    <line x1="60"  y1="120" x2="130" y2="280"/>
+    <line x1="130" y1="280" x2="200" y2="80"/>
+    <line x1="200" y1="80"  x2="260" y2="260"/>
+    <line x1="260" y1="260" x2="340" y2="140"/>
+    <line x1="130" y1="280" x2="260" y2="260"/>
+    <line x1="40"  y1="500" x2="130" y2="280"/>
+    <line x1="260" y1="260" x2="370" y2="480"/>
+    <line x1="40"  y1="500" x2="200" y2="600"/>
+    <line x1="200" y1="600" x2="370" y2="480"/>
+    <line x1="130" y1="280" x2="200" y2="600"/>
+  </g>
+  <g fill="#1B2A6B">
+    <polygon points="200,68 204,80 196,80"/>
+    <polygon points="60,108 64,120 56,120"/>
+    <polygon points="340,128 344,140 336,140"/>
+    <polygon points="130,268 134,280 126,280"/>
+    <polygon points="260,248 264,260 256,260"/>
+    <polygon points="40,488 44,500 36,500"/>
+    <polygon points="370,468 374,480 366,480"/>
+    <polygon points="200,588 204,600 196,600"/>
+  </g>
+</svg>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo-block">
+      <img src="logo2.png" alt="Jean Monnet">
+      <div class="logo-text">
+        <span class="inst">IES Gerardo Diego</span>
+        <span class="prog">Programa Jean Monnet</span>
+      </div>
+    </div>
+    <span class="semana-badge">Semana Ciencia</span>
+  </div>
+
+  <!-- VISOR 3D -->
+  <div class="viewer-wrap">
+    <model-viewer
+      src="torre_eifel.glb"
+      alt="Molécula de ADN"
+      camera-controls
+      auto-rotate
+      auto-rotate-delay="1000"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      shadow-intensity="1.2"
+      touch-action="none"
+      interaction-prompt="none">
+    </model-viewer>
+
+    <div class="hint">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8l-.3-1.2A2 2 0 0 0 2 13v1c0 4.4 3.6 8 8 8h2c3.3 0 6-2.7 6-6v-3a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/>
+      </svg>
+      Arrastra para rotar · Pellizca para zoom
+    </div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel">
+    <div class="model-category">Monumentos</div>
+    <div class="model-name">Torre Eifel</div>
+    <div class="name-line"></div>
+  </div>
+
+</div>
+</body>
+</html>
